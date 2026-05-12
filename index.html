@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Z&S Stitcher — Premium Embroidery Digitizing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #C9922A;
+    --gold-light: #E8B84B;
+    --gold-pale: #FDF4E3;
+    --gold-muted: #F5E6C8;
+    --dark: #1A1612;
+    --dark-2: #2C2419;
+    --dark-3: #3D3228;
+    --mid: #6B5B45;
+    --light: #F9F5EE;
+    --white: #FFFFFF;
+    --text: #2C2419;
+    --text-muted: #7A6A56;
+    --border: rgba(201,146,42,0.2);
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+    --radius: 12px;
+    --radius-lg: 20px;
+    --transition: 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--white);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 0 2rem;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    transition: box-shadow var(--transition);
+  }
+  header.scrolled { box-shadow: 0 4px 32px rgba(201,146,42,0.12); }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+  .logo-icon {
+    width: 38px; height: 38px;
+    background: var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 14px rgba(201,146,42,0.4);
+    flex-shrink: 0;
+  }
+  .logo-icon svg { width: 18px; height: 18px; color: #fff; stroke: #fff; }
+  .logo-text { display: flex; flex-direction: column; line-height: 1; }
+  .logo-text .brand { font-family: var(--serif); font-weight: 700; font-size: 1.25rem; color: var(--dark); letter-spacing: 0.04em; }
+  .logo-text .tagline { font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.28em; color: var(--gold); font-weight: 600; }
+
+  nav { display: flex; align-items: center; gap: 2rem; }
+  nav a {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    position: relative;
+    padding-bottom: 2px;
+    transition: color var(--transition);
+  }
+  nav a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 0; right: 0;
+    height: 2px;
+    background: var(--gold);
+    border-radius: 2px;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--transition);
+  }
+  nav a:hover { color: var(--gold); }
+  nav a:hover::after, nav a.active::after { transform: scaleX(1); }
+  nav a.active { color: var(--gold); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-decoration: none;
+    border-radius: 100px;
+    transition: all var(--transition);
+    cursor: pointer;
+    border: none;
+  }
+  .btn-primary {
+    background: var(--gold);
+    color: #fff;
+    padding: 0.6rem 1.5rem;
+    box-shadow: 0 4px 16px rgba(201,146,42,0.35);
+  }
+  .btn-primary:hover {
+    background: var(--gold-light);
+    box-shadow: 0 6px 24px rgba(201,146,42,0.5);
+    transform: translateY(-1px);
+  }
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    padding: 0.6rem 1.5rem;
+    border: 1.5px solid rgba(44,36,25,0.25);
+  }
+  .btn-outline:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    transform: translateY(-1px);
+  }
+  .btn-lg { padding: 0.9rem 2.2rem; font-size: 1rem; }
+
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+  }
+  .hamburger span {
+    display: block;
+    width: 24px; height: 2px;
+    background: var(--dark);
+    border-radius: 2px;
+    transition: all var(--transition);
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  .mobile-nav {
+    display: none;
+    position: fixed;
+    top: 68px; left: 0; right: 0;
+    background: rgba(255,255,255,0.98);
+    backdrop-filter: blur(20px);
+    padding: 1.5rem 2rem 2rem;
+    border-bottom: 1px solid var(--border);
+    z-index: 99;
+    flex-direction: column;
+    gap: 0;
+  }
+  .mobile-nav.open { display: flex; }
+  .mobile-nav a {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text);
+    text-decoration: none;
+    padding: 0.9rem 0;
+    border-bottom: 1px solid var(--border);
+    transition: color var(--transition);
+  }
+  .mobile-nav a:hover { color: var(--gold); }
+  .mobile-nav .btn-primary { margin-top: 1.5rem; justify-content: center; }
+
+  /* ── SECTIONS SHARED ── */
+  section { display: none; }
+  section.active { display: block; }
+  main { padding-top: 68px; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: calc(100vh - 68px);
+    background: linear-gradient(160deg, var(--gold-pale) 0%, #fff 50%, var(--gold-muted) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    padding: 5rem 2rem;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -80px; left: 50%;
+    transform: translateX(-50%);
+    width: 800px; height: 600px;
+    background: radial-gradient(ellipse, rgba(201,146,42,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-inner {
+    text-align: center;
+    max-width: 860px;
+    position: relative;
+    z-index: 1;
+    animation: fadeUp 0.9s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(32px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(201,146,42,0.12);
+    border: 1px solid rgba(201,146,42,0.3);
+    color: var(--gold);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+    margin-bottom: 2rem;
+    letter-spacing: 0.02em;
+  }
+  .badge .dot {
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.5; }
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--dark);
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--gold);
+    position: relative;
+  }
+  .hero p {
+    font-size: clamp(1rem, 2vw, 1.2rem);
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+  .hero-ctas { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+  .trust-bar {
+    margin-top: 5rem;
+    padding-top: 3rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .trust-bar p { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.22em; color: var(--text-muted); }
+  .trust-logos { display: flex; gap: 3rem; flex-wrap: wrap; justify-content: center; }
+  .trust-logos span {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: rgba(44,36,25,0.2);
+    letter-spacing: 0.08em;
+    transition: color var(--transition);
+  }
+  .trust-logos span:hover { color: rgba(201,146,42,0.5); }
+
+  /* ── STATS STRIP ── */
+  .stats-strip {
+    background: var(--dark);
+    padding: 3rem 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 2rem;
+    text-align: center;
+  }
+  .stat-item {}
+  .stat-num {
+    font-family: var(--serif);
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--gold-light);
+    line-height: 1;
+    display: block;
+  }
+  .stat-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: rgba(255,255,255,0.4);
+    display: block;
+    margin-top: 0.4rem;
+    font-weight: 500;
+  }
+
+  /* ── SECTION WRAPPER ── */
+  .section-pad { padding: 6rem 2rem; }
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  .section-label {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--gold);
+    font-weight: 700;
+    border: 1px solid rgba(201,146,42,0.3);
+    background: rgba(201,146,42,0.07);
+    padding: 0.3rem 0.9rem;
+    border-radius: 100px;
+    margin-bottom: 1.2rem;
+  }
+  .section-title {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    color: var(--dark);
+    line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+  .section-subtitle {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    max-width: 560px;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+  .text-center { text-align: center; }
+  .text-center .section-subtitle { margin: 0 auto; }
+
+  /* ── SERVICES (HOME) ── */
+  .services-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 4rem;
+  }
+  @media (max-width: 680px) { .services-grid { grid-template-columns: 1fr; } }
+
+  .service-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    transition: all var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+  .service-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    opacity: 0;
+    transition: opacity var(--transition);
+  }
+  .service-card:hover { border-color: rgba(201,146,42,0.4); box-shadow: 0 8px 40px rgba(201,146,42,0.12); transform: translateY(-3px); }
+  .service-card:hover::before { opacity: 1; }
+
+  .service-icon {
+    width: 56px; height: 56px;
+    background: rgba(201,146,42,0.1);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+  .service-icon svg { width: 26px; height: 26px; stroke: var(--gold); fill: none; stroke-width: 1.75; }
+  .service-card h3 {
+    font-family: var(--serif);
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 0.9rem;
+  }
+  .service-card p { color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.7; font-size: 0.95rem; }
+  .service-list { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 2rem; }
+  .service-list li {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.9rem; color: var(--text-muted);
+  }
+  .service-list li::before {
+    content: '';
+    width: 18px; height: 18px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23C9922A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E") center/contain no-repeat;
+    flex-shrink: 0;
+  }
+  .service-link {
+    color: var(--gold);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: gap var(--transition);
+  }
+  .service-link:hover { gap: 10px; }
+
+  /* ── PORTFOLIO GRID ── */
+  .portfolio-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
+  }
+  .portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+  @media (max-width: 700px) { .portfolio-grid { grid-template-columns: 1fr; } }
+  @media (min-width: 701px) and (max-width: 900px) { .portfolio-grid { grid-template-columns: 1fr 1fr; } }
+
+  .portfolio-item {
+    position: relative;
+    aspect-ratio: 4/5;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--gold-muted);
+    cursor: pointer;
+  }
+  .portfolio-item:nth-child(2) { transform: translateY(40px); }
+  @media (max-width: 700px) { .portfolio-item:nth-child(2) { transform: none; } }
+
+  .portfolio-thumb {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s cubic-bezier(0.4,0,0.2,1);
+  }
+  .portfolio-item:hover .portfolio-thumb { transform: scale(1.06); }
+
+  .portfolio-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(26,22,18,0.85) 0%, rgba(26,22,18,0.05) 60%, transparent 100%);
+    opacity: 0;
+    transition: opacity var(--transition);
+    display: flex;
+    align-items: flex-end;
+    padding: 1.5rem;
+  }
+  .portfolio-item:hover .portfolio-overlay { opacity: 1; }
+  .portfolio-info { transform: translateY(8px); transition: transform var(--transition); }
+  .portfolio-item:hover .portfolio-info { transform: translateY(0); }
+  .portfolio-cat {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--gold-light);
+    font-weight: 700;
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+  .portfolio-name { font-size: 1.1rem; font-weight: 600; color: #fff; font-family: var(--serif); }
+
+  /* Placeholder artwork for portfolio items (SVG patterns) */
+  .portfolio-art {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--gold-muted);
+    position: absolute; inset: 0;
+  }
+
+  /* ── WHY US ── */
+  .why-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: center;
+  }
+  @media (max-width: 760px) { .why-grid { grid-template-columns: 1fr; gap: 3rem; } }
+
+  .why-features { display: flex; flex-direction: column; gap: 2rem; margin-top: 2.5rem; }
+  .why-feature { display: flex; gap: 1.2rem; align-items: flex-start; }
+  .feature-icon {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(201,146,42,0.1);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .feature-icon svg { width: 20px; height: 20px; stroke: var(--gold); fill: none; stroke-width: 1.75; }
+  .feature-text h4 { font-weight: 600; font-size: 1rem; color: var(--dark); margin-bottom: 0.3rem; }
+  .feature-text p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.65; }
+
+  .stats-mosaic {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  .stat-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    text-align: center;
+    transition: all var(--transition);
+  }
+  .stat-card:hover { border-color: rgba(201,146,42,0.4); box-shadow: 0 4px 20px rgba(201,146,42,0.1); }
+  .stat-card .num {
+    font-family: var(--serif);
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--gold);
+    display: block;
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+  .stat-card .lbl { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.18em; color: var(--text-muted); font-weight: 600; }
+
+  /* ── TESTIMONIALS ── */
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    margin-top: 3.5rem;
+  }
+  @media (max-width: 760px) { .testimonials-grid { grid-template-columns: 1fr; } }
+
+  .testimonial-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    transition: all var(--transition);
+  }
+  .testimonial-card:hover { border-color: rgba(201,146,42,0.3); box-shadow: 0 6px 28px rgba(201,146,42,0.1); }
+  .stars { display: flex; gap: 3px; margin-bottom: 1.2rem; }
+  .star { color: var(--gold); font-size: 14px; }
+  .testimonial-card p {
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    font-style: italic;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+  }
+  .testimonial-divider { border: none; border-top: 1px solid var(--border); margin-bottom: 1rem; }
+  .testimonial-name { font-weight: 600; font-size: 0.9rem; color: var(--dark); }
+  .testimonial-role { font-size: 0.8rem; color: var(--text-muted); }
+
+  /* ── CTA BANNER ── */
+  .cta-banner {
+    background: var(--gold-pale);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 6rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-banner::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 700px; height: 400px;
+    background: radial-gradient(ellipse, rgba(201,146,42,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cta-inner {
+    position: relative;
+    max-width: 640px;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 4rem;
+    box-shadow: 0 20px 60px rgba(201,146,42,0.12);
+  }
+  .cta-inner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%; transform: translateX(-50%);
+    width: 80px; height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    border-radius: 3px;
+  }
+  .cta-inner h2 { font-family: var(--serif); font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 700; color: var(--dark); margin-bottom: 1rem; }
+  .cta-inner p { color: var(--text-muted); font-size: 1rem; line-height: 1.7; margin-bottom: 2.5rem; }
+  .cta-inner .highlight { color: var(--gold); font-weight: 700; }
+  .cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+  /* ── FULL SERVICES PAGE ── */
+  .services-full-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  @media (max-width: 680px) { .services-full-grid { grid-template-columns: 1fr; } }
+
+  /* ── PRICING PAGE ── */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3.5rem;
+    align-items: start;
+  }
+  .pricing-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+    position: relative;
+    transition: all var(--transition);
+  }
+  .pricing-card.featured {
+    border: 2px solid var(--gold);
+    box-shadow: 0 12px 40px rgba(201,146,42,0.18);
+  }
+  .pricing-card:hover:not(.featured) { border-color: rgba(201,146,42,0.4); box-shadow: 0 8px 32px rgba(201,146,42,0.1); }
+  .popular-badge {
+    position: absolute;
+    top: -14px; left: 50%; transform: translateX(-50%);
+    background: var(--gold);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 0.3rem 1rem;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+  .plan-name { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.18em; font-weight: 700; color: var(--gold); margin-bottom: 0.8rem; }
+  .plan-price { font-family: var(--serif); font-size: 3rem; font-weight: 700; color: var(--dark); line-height: 1; }
+  .plan-price span { font-size: 1.2rem; font-weight: 400; color: var(--text-muted); }
+  .plan-desc { font-size: 0.9rem; color: var(--text-muted); margin: 0.8rem 0 1.5rem; line-height: 1.6; }
+  .plan-divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+  .plan-features { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem; }
+  .plan-features li {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.9rem; color: var(--text-muted);
+  }
+  .plan-features li.included::before {
+    content: '✓';
+    color: var(--gold);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .plan-features li.excluded { opacity: 0.4; }
+  .plan-features li.excluded::before {
+    content: '×';
+    flex-shrink: 0;
+  }
+  .plan-btn { width: 100%; justify-content: center; }
+
+  /* ── BLOG PAGE ── */
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 3.5rem;
+  }
+  .blog-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: all var(--transition);
+    cursor: pointer;
+  }
+  .blog-card:hover { box-shadow: 0 8px 32px rgba(201,146,42,0.12); transform: translateY(-3px); border-color: rgba(201,146,42,0.3); }
+  .blog-thumb {
+    height: 200px;
+    background: var(--gold-muted);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+  .blog-cat-tag {
+    position: absolute; top: 1rem; left: 1rem;
+    background: var(--gold);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.25rem 0.7rem;
+    border-radius: 100px;
+  }
+  .blog-content { padding: 1.75rem; }
+  .blog-meta { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.6rem; }
+  .blog-card h3 { font-family: var(--serif); font-size: 1.3rem; font-weight: 700; color: var(--dark); margin-bottom: 0.7rem; line-height: 1.3; }
+  .blog-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.65; margin-bottom: 1.2rem; }
+  .blog-link { color: var(--gold); font-weight: 600; font-size: 0.875rem; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; transition: gap var(--transition); }
+  .blog-link:hover { gap: 9px; }
+
+  /* ── CONTACT PAGE ── */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 4rem;
+    align-items: start;
+    margin-top: 3rem;
+  }
+  @media (max-width: 760px) { .contact-grid { grid-template-columns: 1fr; gap: 3rem; } }
+
+  .contact-info h3 { font-family: var(--serif); font-size: 1.5rem; font-weight: 700; color: var(--dark); margin-bottom: 1rem; }
+  .contact-info p { color: var(--text-muted); line-height: 1.7; margin-bottom: 2rem; font-size: 0.95rem; }
+  .contact-items { display: flex; flex-direction: column; gap: 1.5rem; }
+  .contact-item { display: flex; gap: 1rem; align-items: flex-start; }
+  .contact-item-icon {
+    width: 40px; height: 40px;
+    background: rgba(201,146,42,0.1);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .contact-item-icon svg { width: 18px; height: 18px; stroke: var(--gold); fill: none; stroke-width: 1.75; }
+  .contact-item h4 { font-weight: 600; font-size: 0.9rem; color: var(--dark); margin-bottom: 0.2rem; }
+  .contact-item p { font-size: 0.875rem; color: var(--text-muted); margin: 0; line-height: 1.5; }
+
+  .hours-box {
+    background: var(--gold-pale);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    margin-top: 2rem;
+  }
+  .hours-box h4 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.18em; color: var(--gold); font-weight: 700; margin-bottom: 0.5rem; }
+  .hours-box p { font-size: 0.85rem; color: var(--text-muted); margin: 0; line-height: 1.6; }
+
+  .contact-form-wrap {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem;
+  }
+  .form-group { margin-bottom: 1.25rem; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+  label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--dark); margin-bottom: 0.4rem; }
+  input, select, textarea {
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    color: var(--text);
+    background: var(--white);
+    transition: border-color var(--transition), box-shadow var(--transition);
+    outline: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,146,42,0.12);
+  }
+  textarea { resize: vertical; min-height: 120px; }
+  .form-submit { margin-top: 0.5rem; }
+  .form-submit .btn { width: 100%; justify-content: center; }
+  .form-success {
+    display: none;
+    background: rgba(201,146,42,0.08);
+    border: 1px solid rgba(201,146,42,0.3);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+    color: var(--gold);
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-top: 1rem;
+  }
+  .form-success.show { display: block; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--dark);
+    color: rgba(255,255,255,0.9);
+    padding: 4rem 2rem 2rem;
+  }
+  .footer-grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
+    gap: 3rem;
+    margin-bottom: 3rem;
+  }
+  @media (max-width: 760px) { .footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; } }
+  @media (max-width: 460px) { .footer-grid { grid-template-columns: 1fr; } }
+
+  .footer-brand p { font-size: 0.875rem; color: rgba(255,255,255,0.4); line-height: 1.7; margin-top: 1rem; max-width: 260px; }
+  .footer-socials { display: flex; gap: 10px; margin-top: 1.5rem; }
+  .social-btn {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none;
+    transition: all var(--transition);
+    color: rgba(255,255,255,0.5);
+  }
+  .social-btn:hover { background: rgba(201,146,42,0.2); border-color: rgba(201,146,42,0.4); color: var(--gold-light); }
+  .social-btn svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.75; }
+
+  .footer-col h4 {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.5);
+    font-weight: 700;
+    margin-bottom: 1.2rem;
+  }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; }
+  .footer-col ul li a {
+    font-size: 0.875rem;
+    color: rgba(255,255,255,0.4);
+    text-decoration: none;
+    transition: color var(--transition);
+    cursor: pointer;
+  }
+  .footer-col ul li a:hover { color: var(--gold-light); }
+
+  .footer-contact-items { display: flex; flex-direction: column; gap: 1rem; }
+  .footer-contact-item { display: flex; gap: 0.8rem; align-items: flex-start; }
+  .footer-contact-item svg { width: 16px; height: 16px; stroke: var(--gold); fill: none; stroke-width: 1.75; flex-shrink: 0; margin-top: 2px; }
+  .footer-contact-item span { font-size: 0.85rem; color: rgba(255,255,255,0.4); line-height: 1.5; }
+  .footer-contact-item a { color: rgba(255,255,255,0.4); text-decoration: none; transition: color var(--transition); }
+  .footer-contact-item a:hover { color: var(--gold-light); }
+
+  .footer-bottom {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .footer-bottom p { font-size: 0.8rem; color: rgba(255,255,255,0.25); }
+  .footer-links { display: flex; gap: 1.5rem; }
+  .footer-links a { font-size: 0.8rem; color: rgba(255,255,255,0.25); text-decoration: none; transition: color var(--transition); cursor: pointer; }
+  .footer-links a:hover { color: var(--gold-light); }
+
+  /* ── DECORATIVE SVGs in portfolio ── */
+  .port-svg { width: 80%; height: 80%; }
+
+  /* ── SCROLL ANIMATION ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── MISC ── */
+  .arrow-right {
+    display: inline-block;
+    font-style: normal;
+    transition: transform 0.25s;
+  }
+  a:hover .arrow-right { transform: translateX(3px); }
+
+  @media (max-width: 900px) {
+    nav, .desktop-cta { display: none; }
+    .hamburger { display: flex; }
+  }
+
+  .bg-light { background: var(--light); }
+  .bg-muted { background: #F5F2ED; }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header id="main-header">
+  <a class="logo" onclick="navigate('home')">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="6" cy="6" r="3"/><path d="M8.12 8.12 12 12"/><path d="M20 4 8.12 15.88"/>
+        <circle cx="6" cy="18" r="3"/><path d="M14.8 14.8 20 20"/>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <span class="brand">Z&S</span>
+      <span class="tagline">Stitcher</span>
+    </div>
+  </a>
+
+  <nav>
+    <a onclick="navigate('home')" class="active" id="nav-home">Home</a>
+    <a onclick="navigate('services')" id="nav-services">Services</a>
+    <a onclick="navigate('portfolio')" id="nav-portfolio">Portfolio</a>
+    <a onclick="navigate('pricing')" id="nav-pricing">Pricing</a>
+    <a onclick="navigate('blog')" id="nav-blog">Blog</a>
+    <a onclick="navigate('contact')" id="nav-contact">Contact</a>
+  </nav>
+  <a class="btn btn-primary desktop-cta" onclick="navigate('contact')">Get a Quote <span class="arrow-right">›</span></a>
+  <button class="hamburger" id="hamburger" onclick="toggleMobile()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<div class="mobile-nav" id="mobile-nav">
+  <a onclick="navigate('home');closeMobile()">Home</a>
+  <a onclick="navigate('services');closeMobile()">Services</a>
+  <a onclick="navigate('portfolio');closeMobile()">Portfolio</a>
+  <a onclick="navigate('pricing');closeMobile()">Pricing</a>
+  <a onclick="navigate('blog');closeMobile()">Blog</a>
+  <a onclick="navigate('contact');closeMobile()">Contact</a>
+  <a class="btn btn-primary" onclick="navigate('contact');closeMobile()">Get a Quote</a>
+</div>
+
+<main>
+
+<!-- ════════════════════════════════
+     HOME
+════════════════════════════════ -->
+<section id="page-home" class="active">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="badge"><div class="dot"></div>World-Class Digitizing Studio</div>
+      <h1>Precision Meets<br><em>Artistry.</em></h1>
+      <p>We convert your artwork into flawless, production-ready embroidery files and crisp vector graphics. Premium quality for apparel brands and fashion designers worldwide.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary btn-lg" onclick="navigate('contact')">Start Your Project <span class="arrow-right">→</span></a>
+        <a class="btn btn-outline btn-lg" onclick="navigate('portfolio')">View Portfolio</a>
+      </div>
+      <div class="trust-bar">
+        <p>Trusted by brands worldwide</p>
+        <div class="trust-logos">
+          <span>VANGUARD</span>
+          <span>Lumière</span>
+          <span>AURA</span>
+          <span>Kensington</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-strip">
+    <div class="stat-item"><span class="stat-num">15k+</span><span class="stat-label">Designs Digitized</span></div>
+    <div class="stat-item"><span class="stat-num">99%</span><span class="stat-label">Client Satisfaction</span></div>
+    <div class="stat-item"><span class="stat-num">24h</span><span class="stat-label">Avg Turnaround</span></div>
+    <div class="stat-item"><span class="stat-num">10+</span><span class="stat-label">Years Experience</span></div>
+  </div>
+
+  <!-- Services Preview -->
+  <div class="section-pad bg-light">
+    <div class="container">
+      <div class="text-center">
+        <span class="section-label">What We Do</span>
+        <h2 class="section-title">Masterful Conversion</h2>
+        <p class="section-subtitle">Specialized services to prepare your designs for physical production, ensuring every detail is preserved with artisan precision.</p>
+      </div>
+      <div class="services-grid reveal">
+        <div class="service-card">
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>
+          </div>
+          <h3>Embroidery Digitizing</h3>
+          <p>We manually punch every design for optimal pathing, proper underlay, and clean trims. Output to DST, EMB, PES, and more.</p>
+          <ul class="service-list">
+            <li>Left Chest Logos</li>
+            <li>Jacket Backs</li>
+            <li>3D Puff Embroidery</li>
+            <li>Appliqué</li>
+          </ul>
+          <a class="service-link" onclick="navigate('services')">Learn more <span class="arrow-right">→</span></a>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <h3>Vector Art Services</h3>
+          <p>Flawless redrawing of blurry raster images into crisp, scalable vector graphics perfect for screen printing, vinyl, and CNC.</p>
+          <ul class="service-list">
+            <li>Logo Redraws</li>
+            <li>Color Separation</li>
+            <li>Line Art Illustration</li>
+            <li>Typography Recreation</li>
+          </ul>
+          <a class="service-link" onclick="navigate('services')">Learn more <span class="arrow-right">→</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Portfolio Preview -->
+  <div class="section-pad">
+    <div class="container">
+      <div class="portfolio-header">
+        <div>
+          <span class="section-label">Portfolio</span>
+          <h2 class="section-title">The Gallery</h2>
+          <p class="section-subtitle">A curated selection of our finest work.</p>
+        </div>
+        <a class="btn btn-outline" onclick="navigate('portfolio')">View Full Portfolio <span class="arrow-right">→</span></a>
+      </div>
+      <div class="portfolio-grid reveal">
+        <div class="portfolio-item">
+          <div class="portfolio-art">
+            <svg class="port-svg" viewBox="0 0 200 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="200" height="250" fill="#F5E6C8"/>
+              <circle cx="100" cy="125" r="70" stroke="#C9922A" stroke-width="2" fill="none"/>
+              <path d="M60 125 Q100 70 140 125 Q100 180 60 125" fill="#E8B84B" opacity="0.3"/>
+              <ellipse cx="100" cy="100" rx="20" ry="30" stroke="#C9922A" stroke-width="1.5" fill="#C9922A" opacity="0.2"/>
+              <circle cx="100" cy="90" r="8" fill="#C9922A"/>
+              <text x="100" y="210" text-anchor="middle" font-size="11" font-family="Georgia,serif" fill="#C9922A" font-style="italic">Tiger Patch</text>
+            </svg>
+          </div>
+          <div class="portfolio-overlay">
+            <div class="portfolio-info">
+              <span class="portfolio-cat">Digitizing</span>
+              <div class="portfolio-name">Tiger Patch Detailed</div>
+            </div>
+          </div>
+        </div>
+        <div class="portfolio-item">
+          <div class="portfolio-art">
+            <svg class="port-svg" viewBox="0 0 200 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="200" height="250" fill="#EDD9B0"/>
+              <polygon points="100,40 150,90 130,160 100,180 70,160 50,90" stroke="#C9922A" stroke-width="2" fill="#C9922A" opacity="0.15"/>
+              <polygon points="100,60 135,95 120,150 100,165 80,150 65,95" stroke="#C9922A" stroke-width="1.5" fill="none"/>
+              <circle cx="100" cy="105" r="18" fill="#C9922A" opacity="0.4"/>
+              <path d="M88 105 L96 113 L115 94" stroke="#C9922A" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <text x="100" y="210" text-anchor="middle" font-size="11" font-family="Georgia,serif" fill="#8B6914" font-style="italic">Jacket Crest</text>
+            </svg>
+          </div>
+          <div class="portfolio-overlay">
+            <div class="portfolio-info">
+              <span class="portfolio-cat">Digitizing</span>
+              <div class="portfolio-name">Leather Jacket Crest</div>
+            </div>
+          </div>
+        </div>
+        <div class="portfolio-item">
+          <div class="portfolio-art">
+            <svg class="port-svg" viewBox="0 0 200 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="200" height="250" fill="#F9F0DC"/>
+              <polygon points="100,30 125,90 190,90 138,128 158,190 100,152 42,190 62,128 10,90 75,90" stroke="#C9922A" stroke-width="1.5" fill="#C9922A" opacity="0.12"/>
+              <polygon points="100,55 118,100 165,100 128,122 143,168 100,143 57,168 72,122 35,100 82,100" fill="#C9922A" opacity="0.25"/>
+              <circle cx="100" cy="115" r="16" fill="#C9922A"/>
+              <text x="100" y="210" text-anchor="middle" font-size="11" font-family="Georgia,serif" fill="#8B6914" font-style="italic">Geometric Eagle</text>
+            </svg>
+          </div>
+          <div class="portfolio-overlay">
+            <div class="portfolio-info">
+              <span class="portfolio-cat">Vector Art</span>
+              <div class="portfolio-name">Geometric Eagle</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Why Us -->
+  <div class="section-pad bg-muted">
+    <div class="container">
+      <div class="why-grid">
+        <div class="reveal">
+          <span class="section-label">Why Us</span>
+          <h2 class="section-title">We Don't Just Auto-Trace. We Craft.</h2>
+          <p class="section-subtitle">Many cheap services run your logo through automated software, resulting in thread breaks and poor registration. Our artisans manually map every stitch path.</p>
+          <div class="why-features">
+            <div class="why-feature">
+              <div class="feature-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              </div>
+              <div class="feature-text">
+                <h4>24-Hour Turnaround</h4>
+                <p>Standard delivery within 24 hours. Rush options available for urgent orders.</p>
+              </div>
+            </div>
+            <div class="why-feature">
+              <div class="feature-icon">
+                <svg viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+              </div>
+              <div class="feature-text">
+                <h4>Unlimited Revisions</h4>
+                <p>We aren't happy until it stitches perfectly. Revisions are free until you approve.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="stats-mosaic reveal">
+          <div class="stat-card"><span class="num">15k+</span><span class="lbl">Designs Digitized</span></div>
+          <div class="stat-card"><span class="num">99%</span><span class="lbl">Client Satisfaction</span></div>
+          <div class="stat-card"><span class="num">24h</span><span class="lbl">Avg Turnaround</span></div>
+          <div class="stat-card"><span class="num">10+</span><span class="lbl">Years Experience</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Testimonials -->
+  <div class="section-pad">
+    <div class="container">
+      <div class="text-center">
+        <span class="section-label">Testimonials</span>
+        <h2 class="section-title">What Clients Say</h2>
+      </div>
+      <div class="testimonials-grid reveal">
+        <div class="testimonial-card">
+          <div class="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+          <p>"Z&S Stitcher has been our go-to for 3 years. The quality is flawless and the turnaround is always on time."</p>
+          <hr class="testimonial-divider">
+          <div class="testimonial-name">Marcus Webb</div>
+          <div class="testimonial-role">Apparel Brand Owner</div>
+        </div>
+        <div class="testimonial-card">
+          <div class="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+          <p>"I've tried many digitizers, but none come close to Z&S. The stitch planning is absolutely unmatched."</p>
+          <hr class="testimonial-divider">
+          <div class="testimonial-name">Priya Sharma</div>
+          <div class="testimonial-role">Fashion Designer</div>
+        </div>
+        <div class="testimonial-card">
+          <div class="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+          <p>"Their vector art is so clean — our printers love the file organization. Highly recommended studio."</p>
+          <hr class="testimonial-divider">
+          <div class="testimonial-name">James Okafor</div>
+          <div class="testimonial-role">Screen Print Studio</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-banner">
+    <div class="cta-inner reveal">
+      <h2>Ready for Flawless Embroidery?</h2>
+      <p>Send us your artwork today and get a production-ready file by tomorrow. First-time clients get <span class="highlight">20% off</span> their first order.</p>
+      <div class="cta-buttons">
+        <a class="btn btn-primary btn-lg" onclick="navigate('contact')">Get Your Free Quote <span class="arrow-right">→</span></a>
+        <a class="btn btn-outline btn-lg" onclick="navigate('pricing')">View Pricing</a>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ════════════════════════════════
+     SERVICES
+════════════════════════════════ -->
+<section id="page-services">
+  <div class="hero" style="min-height:40vh; padding: 4rem 2rem;">
+    <div class="hero-inner">
+      <div class="badge"><div class="dot"></div>Our Services</div>
+      <h1 style="font-size:clamp(2.5rem,6vw,4rem)">Everything You<br><em>Need to Stitch.</em></h1>
+      <p>From complex digitizing to razor-sharp vector conversions — we handle every step of your production prep.</p>
+    </div>
+  </div>
+
+  <div class="section-pad">
+    <div class="container">
+      <div class="services-full-grid">
+        <div class="service-card">
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>
+          </div>
+          <h3>Embroidery Digitizing</h3>
+          <p>Manual punching for every design. Proper underlay, optimal stitch direction, clean trims. Output to DST, EMB, PES, JEF, HUS, and more.</p>
+          <ul class="service-list">
+            <li>Left Chest Logos & Cap Fronts</li>
+            <li>Jacket Backs & Full-Front Designs</li>
+            <li>3D Puff Embroidery</li>
+            <li>Appliqué & Tackle Twill</li>
+            <li>Towel & Fleece Digitizing</li>
+          </ul>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+          </div>
+          <h3>Vector Art Services</h3>
+          <p>Redrawing blurry raster images into crisp scalable vectors. Perfect for screen print, vinyl cutting, and CNC routing.</p>
+          <ul class="service-list">
+            <li>Logo Redraws & Cleanups</li>
+            <li>Color Separation for Screen Print</li>
+            <li>Line Art & Illustration</li>
+            <li>Typography Recreation</li>
+            <li>SVG / AI / EPS / PDF Output</li>
+          </ul>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+          </div>
+          <h3>Custom Patch Design</h3>
+          <p>Woven, embroidered, or PVC patches designed from concept to production-ready artwork for uniform and fashion programs.</p>
+          <ul class="service-list">
+            <li>Merrowed Border Patches</li>
+            <li>Iron-On & Sew-On Options</li>
+            <li>Military & Morale Patches</li>
+            <li>Name Tapes & Rank Insignia</li>
+            <li>Rush Production Available</li>
+          </ul>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">
+            <svg viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
+          </div>
+          <h3>Rush Orders (24h)</h3>
+          <p>Need it fast? Our express lane delivers production-ready files in as little as 4 hours for standard left-chest logos.</p>
+          <ul class="service-list">
+            <li>4-Hour Express for Small Designs</li>
+            <li>Same-Day for Standard Logos</li>
+            <li>Priority Queue & Dedicated Review</li>
+            <li>Dedicated Account Manager</li>
+            <li>Multiple Revision Rounds Included</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cta-banner">
+    <div class="cta-inner">
+      <h2>Have a Project in Mind?</h2>
+      <p>Upload your artwork and get a quote in minutes. No commitments, no setup fees.</p>
+      <div class="cta-buttons">
+        <a class="btn btn-primary btn-lg" onclick="navigate('contact')">Request a Quote <span class="arrow-right">→</span></a>
+        <a class="btn btn-outline btn-lg" onclick="navigate('pricing')">See Pricing</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════
+     PORTFOLIO
+════════════════════════════════ -->
+<section id="page-portfolio">
+  <div class="hero" style="min-height:40vh; padding: 4rem 2rem;">
+    <div class="hero-inner">
+      <div class="badge"><div class="dot"></div>Our Work</div>
+      <h1 style="font-size:clamp(2.5rem,6vw,4rem)">The <em>Gallery.</em></h1>
+      <p>A curated showcase of embroidery digitizing and vector art projects delivered to clients worldwide.</p>
+    </div>
+  </div>
+  <div class="section-pad">
+    <div class="container">
+      <div class="portfolio-grid" style="grid-template-columns: repeat(3,1fr); gap:1.5rem;">
+        <!-- 6 portfolio items -->
+        <div class="portfolio-item" style="aspect-ratio:1;">
+          <div class="portfolio-art">
+            <svg class="port-svg" viewBox="0 0 180 180" fill="none">
+              <rect width="180" height="180" fill="#F5E6C8"/>
+              <circle cx="90" cy="90" r="60" stroke="#C9922A" stroke-width="2" fill="none"/>
+              <circle cx="90" cy="90" r="40" stroke="#C9922A" stroke-width="1" fill="#C9922A" opacity="0.15"/>
+              <path d="M70 90 L90 70 L110 90 L90 110 Z" fill="#C9922A" opacity="0.6"/>
+              <text x="90" y="160" text-anchor="middle" font-size="10" font-family="Georgia,serif" fill="#8B6914" font-style="italic">Varsity Logo</text>
+            </svg>
+          </div>
+          <div class="portfolio-overlay"><div class="portfolio-info"><span class="portfolio-cat">Digitizing</span><div class="portfolio-name">Varsity Team Logo</div></div></div>
+        </div>
+        <div class="portfolio-item" style="aspect-ratio:1;">
+          <div class="portfolio-art" style="background:#EDD9B0;">
+            <svg class="port-svg" viewBox="0 0 180 180" fill="none">
+              <rect width="180" height="180" fill="#EDD9B0"/>
+              <rect x="40" y="40" width="100" height="100" rx="8" stroke="#C9922A" stroke-width="2" fill="#C9922A" opacity="0.1"/>
+              <path d="M60 90 L75 75 L90 90 L105 65 L120 90" stroke="#C9922A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <text x="90" y="160" text-anchor="middle" font-size="10" font-family="Georgia,serif" fill="#8B6914" font-style="italic">Mountain Scene</text>
+            </svg>
+          </div>
+          <div class="portfolio-overlay"><div class="portfolio-info"><span class="portfolio-cat">Digitizing</span><div class="portfolio-name">Mountain Scene Back</div></div></div>
+        </div>
+        <div class="portfolio-item" style="aspect-ratio:1;">
+          <div class="portfolio-art" style="background:#F0E5D0;">
+            <svg class="port-svg" viewBox="0 0 180 180" fill="none">
+              <rect width="180" height="180" fill="#F0E5D0"/>
+              <polygon points="90,25 115,75 170,75 125,108 143,158 90,125 37,158 55,108 10,75 65,75" fill="#C9922A" opacity="0.3" stroke="#C9922A" stroke-width="1.5"/>
+              <text x="90" y="165" text-anchor="middle" font-size="10" font-family="Georgia,serif" fill="#8B6914" font-style="italic">Star Badge</text>
+            </svg>
+          </div>
+          <div class="portfolio-overlay"><div class="portfolio-info"><span class="portfolio-cat">Vector Art</span><div class="portfolio-name">Sheriff Star Badge</div></div></div>
+        </div>
+        <div class="portfolio-item" style="aspect-ratio:1;">
+          <div class="portfolio-art" style="background:#F9EDD5;">
+            <svg class="port-svg" viewBox="0 0 180 180" fill="none">
+              <rect width="180" height="180" fill="#F9EDD5"/>
+              <ellipse cx="90" cy="80" rx="45" ry="55" stroke="#C9922A" stroke-width="2" fill="none"/>
+              <path d="M70 70 Q90 50 110 70 Q90 100 70 70" fill="#C9922A" opacity="0.3"/>
+              <circle cx="90" cy="75" r="10" fill="#C9922A"/>
+              <rect x="78" y="110" width="24" height="30" rx="3" fill="#C9922A" opacity="0.4"/>
+              <text x="90" y="165" text-anchor="middle" font-size="10" font-family="Georgia,serif" fill="#8B6914" font-style="italic">Mascot Design</text>
+            </svg>
+          </div>
+          <div class="portfolio-overlay"><div class="portfolio-info"><span class="portfolio-cat">Digitizing</span><div class="portfolio-name">School Mascot</div></div></div>
+        </div>
+        <div class="portfolio-item" style="aspect-ratio:1; transform:none;">
+          <div class="portfolio-art" style="background:#EEE0C5;">
+            <svg class="port-svg" viewBox="0 0 180 180" fill="none">
+              <rect width="180" height="180" fill="#EEE0C5"/>
+              <path d="M30 90 Q60 40 90 90 Q120 140 150 90" stroke="#C9922A" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <path d="M30 90 Q60 55 90 90 Q120 125 150 90" stroke="#C9922A" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.5"/>
+              <text x="90" y="155" text-anchor="middle" font-size="10" font-family="Georgia,serif" fill="#8B6914" font-style="italic">Wave Pattern</text>
+            </svg>
+          </div>
+          <div class="portfolio-overlay"><div class="portfolio-info"><span class="portfolio-cat">Vector Art</span><div class="portfolio-name">Ocean Wave Pattern</div></div></div>
+        </div>
+        <div class="portfolio-item" style="aspect-ratio:1;">
+          <div class="portfolio-art" style="background:#F5EDDC;">
+            <svg class="port-svg" viewBox="0 0 180 180" fill="none">
+              <rect width="180" height="180" fill="#F5EDDC"/>
+              <circle cx="90" cy="90" r="55" stroke="#C9922A" stroke-width="2" fill="none"/>
+              <circle cx="90" cy="90" r="42" stroke="#C9922A" stroke-width="1" fill="none" opacity="0.4"/>
+              <text x="90" y="94" text-anchor="middle" font-size="18" font-family="Georgia,serif" fill="#C9922A" font-weight="bold">Z&S</text>
+              <text x="90" y="108" text-anchor="middle" font-size="8" font-family="Arial,sans-serif" fill="#8B6914" letter-spacing="3">STITCHER</text>
+              <text x="90" y="160" text-anchor="middle" font-size="10" font-family="Georgia,serif" fill="#8B6914" font-style="italic">Brand Seal</text>
+            </svg>
+          </div>
+          <div class="portfolio-overlay"><div class="portfolio-info"><span class="portfolio-cat">Vector Art</span><div class="portfolio-name">Circular Brand Seal</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════
+     PRICING
+════════════════════════════════ -->
+<section id="page-pricing">
+  <div class="hero" style="min-height:40vh; padding: 4rem 2rem;">
+    <div class="hero-inner">
+      <div class="badge"><div class="dot"></div>Transparent Pricing</div>
+      <h1 style="font-size:clamp(2.5rem,6vw,4rem)">Simple, <em>Fair Rates.</em></h1>
+      <p>No hidden fees. Pay only for what you need. Volume discounts available for studios and brands.</p>
+    </div>
+  </div>
+  <div class="section-pad">
+    <div class="container">
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="plan-name">Starter</div>
+          <div class="plan-price">$8<span> / design</span></div>
+          <p class="plan-desc">Perfect for individuals and small orders. Left chest logos and simple designs.</p>
+          <hr class="plan-divider">
+          <ul class="plan-features">
+            <li class="included">Up to 5,000 stitches</li>
+            <li class="included">DST / PES / EMB output</li>
+            <li class="included">2 free revisions</li>
+            <li class="included">48-hour delivery</li>
+            <li class="excluded">Rush delivery</li>
+            <li class="excluded">Priority support</li>
+          </ul>
+          <a class="btn btn-outline plan-btn" onclick="navigate('contact')">Get Started</a>
+        </div>
+        <div class="pricing-card featured">
+          <div class="popular-badge">Most Popular</div>
+          <div class="plan-name">Professional</div>
+          <div class="plan-price">$18<span> / design</span></div>
+          <p class="plan-desc">For apparel brands and studios needing consistent quality and fast turnaround.</p>
+          <hr class="plan-divider">
+          <ul class="plan-features">
+            <li class="included">Up to 15,000 stitches</li>
+            <li class="included">All major format outputs</li>
+            <li class="included">Unlimited revisions</li>
+            <li class="included">24-hour delivery</li>
+            <li class="included">Rush options available</li>
+            <li class="excluded">Dedicated account manager</li>
+          </ul>
+          <a class="btn btn-primary plan-btn" onclick="navigate('contact')">Get Started</a>
+        </div>
+        <div class="pricing-card">
+          <div class="plan-name">Enterprise</div>
+          <div class="plan-price">Custom</div>
+          <p class="plan-desc">Volume pricing for studios, fulfillment companies, and large apparel brands.</p>
+          <hr class="plan-divider">
+          <ul class="plan-features">
+            <li class="included">Unlimited stitch count</li>
+            <li class="included">All format outputs</li>
+            <li class="included">Unlimited revisions</li>
+            <li class="included">4-hour rush delivery</li>
+            <li class="included">Rush always included</li>
+            <li class="included">Dedicated account manager</li>
+          </ul>
+          <a class="btn btn-outline plan-btn" onclick="navigate('contact')">Contact Us</a>
+        </div>
+      </div>
+
+      <div style="margin-top:4rem; background:var(--gold-pale); border:1px solid var(--border); border-radius:var(--radius-lg); padding:2.5rem; text-align:center;">
+        <h3 style="font-family:var(--serif); font-size:1.6rem; font-weight:700; color:var(--dark); margin-bottom:0.75rem;">First Order? Get 20% Off.</h3>
+        <p style="color:var(--text-muted); margin-bottom:1.5rem;">New clients receive 20% off their first digitizing or vector art order. No code needed — just mention it when you contact us.</p>
+        <a class="btn btn-primary" onclick="navigate('contact')">Claim Your Discount <span class="arrow-right">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════
+     BLOG
+════════════════════════════════ -->
+<section id="page-blog">
+  <div class="hero" style="min-height:40vh; padding: 4rem 2rem;">
+    <div class="hero-inner">
+      <div class="badge"><div class="dot"></div>Knowledge Base</div>
+      <h1 style="font-size:clamp(2.5rem,6vw,4rem)">The <em>Craft Blog.</em></h1>
+      <p>Tips, tutorials, and industry insights from our team of professional digitizers and vector artists.</p>
+    </div>
+  </div>
+  <div class="section-pad">
+    <div class="container">
+      <div class="blog-grid">
+        <div class="blog-card">
+          <div class="blog-thumb" style="background:linear-gradient(135deg,#F5E6C8,#EDD9B0);">
+            <span class="blog-cat-tag">Digitizing</span>
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+              <circle cx="40" cy="40" r="35" stroke="#C9922A" stroke-width="2" fill="none" opacity="0.4"/>
+              <path d="M25 40 Q40 25 55 40 Q40 55 25 40" fill="#C9922A" opacity="0.3"/>
+            </svg>
+          </div>
+          <div class="blog-content">
+            <div class="blog-meta">May 3, 2026 · 5 min read</div>
+            <h3>Why Underlay Stitches Make or Break Your Embroidery</h3>
+            <p>Most clients never see underlay stitches — but every professional digitizer knows they're the foundation of a quality design.</p>
+            <a class="blog-link">Read More <span class="arrow-right">→</span></a>
+          </div>
+        </div>
+        <div class="blog-card">
+          <div class="blog-thumb" style="background:linear-gradient(135deg,#EDD9B0,#E8C88A);">
+            <span class="blog-cat-tag">Vector Art</span>
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+              <polygon points="40,10 65,55 15,55" stroke="#C9922A" stroke-width="2" fill="#C9922A" opacity="0.3"/>
+            </svg>
+          </div>
+          <div class="blog-content">
+            <div class="blog-meta">April 18, 2026 · 4 min read</div>
+            <h3>Raster vs Vector: Which File Do You Actually Need?</h3>
+            <p>Your printer is asking for a vector file but you only have a JPG. Here's exactly what that means and how to fix it.</p>
+            <a class="blog-link">Read More <span class="arrow-right">→</span></a>
+          </div>
+        </div>
+        <div class="blog-card">
+          <div class="blog-thumb" style="background:linear-gradient(135deg,#F9EDD5,#F5E6C8);">
+            <span class="blog-cat-tag">Tips</span>
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+              <circle cx="40" cy="35" r="20" stroke="#C9922A" stroke-width="2" fill="#C9922A" opacity="0.3"/>
+              <rect x="32" y="55" width="16" height="15" rx="2" fill="#C9922A" opacity="0.4"/>
+            </svg>
+          </div>
+          <div class="blog-content">
+            <div class="blog-meta">April 5, 2026 · 6 min read</div>
+            <h3>Preparing Your Artwork for Embroidery: A Complete Guide</h3>
+            <p>Before you send us a file, follow these steps to ensure the fastest turnaround and the best possible result.</p>
+            <a class="blog-link">Read More <span class="arrow-right">→</span></a>
+          </div>
+        </div>
+        <div class="blog-card">
+          <div class="blog-thumb" style="background:linear-gradient(135deg,#EEE0C5,#E8D0A5);">
+            <span class="blog-cat-tag">Industry</span>
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+              <rect x="15" y="20" width="50" height="40" rx="4" stroke="#C9922A" stroke-width="2" fill="#C9922A" opacity="0.2"/>
+              <path d="M25 35 L35 30 L50 38 L60 28" stroke="#C9922A" stroke-width="2" stroke-linecap="round" fill="none"/>
+            </svg>
+          </div>
+          <div class="blog-content">
+            <div class="blog-meta">March 22, 2026 · 3 min read</div>
+            <h3>The Rise of 3D Puff Embroidery in Streetwear</h3>
+            <p>3D puff is everywhere on caps and hoodies right now. We break down what it takes to digitize it correctly.</p>
+            <a class="blog-link">Read More <span class="arrow-right">→</span></a>
+          </div>
+        </div>
+        <div class="blog-card">
+          <div class="blog-thumb" style="background:linear-gradient(135deg,#F5EDDC,#EDE0C0);">
+            <span class="blog-cat-tag">Tutorial</span>
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+              <path d="M20 60 L40 20 L60 60 Z" stroke="#C9922A" stroke-width="2" fill="none" opacity="0.4"/>
+              <circle cx="40" cy="42" r="8" fill="#C9922A" opacity="0.5"/>
+            </svg>
+          </div>
+          <div class="blog-content">
+            <div class="blog-meta">March 9, 2026 · 7 min read</div>
+            <h3>Color Theory for Embroidery: Matching Thread to Fabric</h3>
+            <p>Thread color on screen never looks exactly the same as thread on fabric. Here's how to bridge that gap.</p>
+            <a class="blog-link">Read More <span class="arrow-right">→</span></a>
+          </div>
+        </div>
+        <div class="blog-card">
+          <div class="blog-thumb" style="background:linear-gradient(135deg,#F0E8D0,#EDE0C0);">
+            <span class="blog-cat-tag">Business</span>
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+              <rect x="20" y="25" width="40" height="30" rx="3" stroke="#C9922A" stroke-width="2" fill="#C9922A" opacity="0.2"/>
+              <path d="M30 45 L36 39 L44 47 L55 35" stroke="#C9922A" stroke-width="2" stroke-linecap="round" fill="none"/>
+            </svg>
+          </div>
+          <div class="blog-content">
+            <div class="blog-meta">February 28, 2026 · 4 min read</div>
+            <h3>How to Scale Your Embroidery Business Without Losing Quality</h3>
+            <p>Growing orders mean growing complexity. Discover how top studios maintain quality at scale with smart digitizing partners.</p>
+            <a class="blog-link">Read More <span class="arrow-right">→</span></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════
+     CONTACT
+════════════════════════════════ -->
+<section id="page-contact">
+  <div class="hero" style="min-height:40vh; padding: 4rem 2rem;">
+    <div class="hero-inner">
+      <div class="badge"><div class="dot"></div>Let's Work Together</div>
+      <h1 style="font-size:clamp(2.5rem,6vw,4rem)">Start Your <em>Project.</em></h1>
+      <p>Send us your artwork and get a free quote within 2 hours. No commitments, no setup fees.</p>
+    </div>
+  </div>
+  <div class="section-pad">
+    <div class="container">
+      <div class="contact-grid">
+        <div class="contact-info">
+          <h3>Get in Touch</h3>
+          <p>Whether you have a complex design or a quick left-chest logo, we're ready to help. Our team responds within 2–4 hours during business hours.</p>
+          <div class="contact-items">
+            <div class="contact-item">
+              <div class="contact-item-icon">
+                <svg viewBox="0 0 24 24"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+              </div>
+              <div>
+                <h4>Email Us</h4>
+                <p>hello@zsstitcher.com</p>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-item-icon">
+                <svg viewBox="0 0 24 24"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg>
+              </div>
+              <div>
+                <h4>Call Us</h4>
+                <p>+1 (555) 123-4567</p>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-item-icon">
+                <svg viewBox="0 0 24 24"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <div>
+                <h4>Based In</h4>
+                <p>Karachi, Pakistan — serving clients worldwide</p>
+              </div>
+            </div>
+          </div>
+          <div class="hours-box">
+            <h4>Business Hours</h4>
+            <p>Monday – Saturday, 9am – 8pm PKT<br>Response within 2–4 hours</p>
+          </div>
+        </div>
+        <div class="contact-form-wrap">
+          <h3 style="font-family:var(--serif); font-size:1.5rem; font-weight:700; color:var(--dark); margin-bottom:1.5rem;">Send a Message</h3>
+          <div class="form-row">
+            <div class="form-group"><label>First Name</label><input type="text" placeholder="Marcus"></div>
+            <div class="form-group"><label>Last Name</label><input type="text" placeholder="Webb"></div>
+          </div>
+          <div class="form-group"><label>Email Address</label><input type="email" placeholder="marcus@yourbrand.com"></div>
+          <div class="form-group"><label>Service Needed</label>
+            <select>
+              <option value="">Select a service...</option>
+              <option>Embroidery Digitizing</option>
+              <option>Vector Art Conversion</option>
+              <option>Custom Patch Design</option>
+              <option>3D Puff Embroidery</option>
+              <option>Rush Order</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Message</label><textarea placeholder="Tell us about your project — design details, quantity, deadline..."></textarea></div>
+          <div class="form-submit"><button class="btn btn-primary btn-lg" onclick="submitForm()">Send Message <span class="arrow-right">→</span></button></div>
+          <div class="form-success" id="form-success">✓ Message sent! We'll reply within 2–4 hours.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a class="logo" onclick="navigate('home')" style="text-decoration:none;">
+        <div class="logo-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><circle cx="6" cy="6" r="3"/><path d="M8.12 8.12 12 12"/><path d="M20 4 8.12 15.88"/><circle cx="6" cy="18" r="3"/><path d="M14.8 14.8 20 20"/></svg></div>
+        <div class="logo-text"><span class="brand" style="color:#fff;">Z&S</span><span class="tagline">Stitcher</span></div>
+      </a>
+      <p>Premium embroidery digitizing and vector art services. We transform your ideas into flawless, production-ready files with artisan precision.</p>
+      <div class="footer-socials">
+        <a href="#" class="social-btn"><svg viewBox="0 0 24 24"><rect width="20" height="20" x="2" y="2" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg></a>
+        <a href="#" class="social-btn"><svg viewBox="0 0 24 24"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg></a>
+        <a href="#" class="social-btn"><svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a onclick="navigate('home')">Home</a></li>
+        <li><a onclick="navigate('services')">Services</a></li>
+        <li><a onclick="navigate('portfolio')">Portfolio</a></li>
+        <li><a onclick="navigate('pricing')">Pricing</a></li>
+        <li><a onclick="navigate('blog')">Blog</a></li>
+        <li><a onclick="navigate('contact')">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Services</h4>
+      <ul>
+        <li><a onclick="navigate('services')">Embroidery Digitizing</a></li>
+        <li><a onclick="navigate('services')">Vector Art Conversion</a></li>
+        <li><a onclick="navigate('services')">Custom Patch Design</a></li>
+        <li><a onclick="navigate('services')">3D Puff Embroidery</a></li>
+        <li><a onclick="navigate('services')">Rush Orders (24h)</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact Us</h4>
+      <div class="footer-contact-items">
+        <div class="footer-contact-item">
+          <svg viewBox="0 0 24 24"><path d="m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+          <span><a href="mailto:hello@zsstitcher.com">hello@zsstitcher.com</a></span>
+        </div>
+        <div class="footer-contact-item">
+          <svg viewBox="0 0 24 24"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg>
+          <span>+1 (555) 123-4567</span>
+        </div>
+        <div style="margin-top:1rem; padding:1rem; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:10px;">
+          <div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.18em;color:var(--gold);font-weight:700;margin-bottom:0.4rem;">Business Hours</div>
+          <div style="font-size:0.82rem;color:rgba(255,255,255,0.35);line-height:1.6;">Mon – Sat, 9am – 8pm PKT<br>Response within 2–4 hours</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Z&S Stitcher. All rights reserved.</p>
+    <div class="footer-links">
+      <a>Privacy Policy</a>
+      <a>Terms of Service</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ── NAVIGATION ──
+  const pages = ['home','services','portfolio','pricing','blog','contact'];
+
+  function navigate(page) {
+    pages.forEach(p => {
+      document.getElementById('page-'+p).classList.remove('active');
+      const navEl = document.getElementById('nav-'+p);
+      if (navEl) navEl.classList.remove('active');
+    });
+    document.getElementById('page-'+page).classList.add('active');
+    const navEl = document.getElementById('nav-'+page);
+    if (navEl) navEl.classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+    setTimeout(initReveal, 100);
+  }
+
+  // ── MOBILE NAV ──
+  function toggleMobile() {
+    const nav = document.getElementById('mobile-nav');
+    const btn = document.getElementById('hamburger');
+    nav.classList.toggle('open');
+    btn.classList.toggle('open');
+  }
+  function closeMobile() {
+    document.getElementById('mobile-nav').classList.remove('open');
+    document.getElementById('hamburger').classList.remove('open');
+  }
+
+  // ── SCROLL HEADER ──
+  window.addEventListener('scroll', () => {
+    document.getElementById('main-header').classList.toggle('scrolled', window.scrollY > 20);
+  });
+
+  // ── REVEAL ON SCROLL ──
+  function initReveal() {
+    const els = document.querySelectorAll('.reveal');
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }});
+    }, {threshold: 0.1});
+    els.forEach(el => { el.classList.remove('visible'); obs.observe(el); });
+  }
+  initReveal();
+
+  // ── CONTACT FORM ──
+  function submitForm() {
+    const success = document.getElementById('form-success');
+    success.classList.add('show');
+    setTimeout(() => success.classList.remove('show'), 5000);
+  }
+</script>
+</body>
+</html>
